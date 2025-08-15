@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Sound Buttons</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+        }
+        button { 
+            font-size: 18px; 
+            padding: 15px 30px; 
+            margin: 20px; 
+            cursor: pointer; 
+        }
+        button:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Sound Buttons</h1>
+    
+    <button id="button1" onclick="playSound(1)">Play Sound 1</button>
+    <button id="button2" onclick="playSound(2)">Play Sound 2</button>
+    
+    <script>
+        let currentAudio = null;
+        
+        function playSound(soundNumber) {
+            // Stop any currently playing sound
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+                enableAllButtons();
+            }
+            
+            // Create audio for the selected sound
+            if (soundNumber === 1) {
+                currentAudio = createBeep(400, 0.3); // Low beep
+            } else {
+                currentAudio = createBeep(800, 0.3); // High beep
+            }
+            
+            // Disable all buttons while playing
+            disableAllButtons();
+            
+            // Re-enable buttons when sound ends
+            setTimeout(() => {
+                currentAudio = null;
+                enableAllButtons();
+            }, 300);
+        }
+        
+        function createBeep(frequency, duration) {
+            const audioContext = new AudioContext();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.1;
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + duration);
+            
+            return oscillator;
+        }
+        
+        function disableAllButtons() {
+            document.getElementById('button1').disabled = true;
+            document.getElementById('button2').disabled = true;
+        }
+        
+        function enableAllButtons() {
+            document.getElementById('button1').disabled = false;
+            document.getElementById('button2').disabled = false;
+        }
+    </script>
+</body>
+</html>

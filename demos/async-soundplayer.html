@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Async/Await Sound Buttons</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+        }
+        button { 
+            font-size: 18px; 
+            padding: 15px 30px; 
+            margin: 20px; 
+            cursor: pointer; 
+        }
+        button:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Async/Await Sound Buttons</h1>
+    
+    <button id="button1" onclick="playSound(1)">Play Sound 1</button>
+    <button id="button2" onclick="playSound(2)">Play Sound 2</button>
+    
+    <div class="info">
+        <strong>Using async/await:</strong> Each sound waits for the previous one to finish completely before starting.
+    </div>
+    
+    <script>
+        let isPlaying = false;
+        
+        async function playSound(soundNumber) {
+            // If already playing, ignore the click
+            if (isPlaying) {
+                console.log('Already playing, ignoring click');
+                return;
+            }
+            
+            isPlaying = true;
+            disableAllButtons();
+            
+            try {
+                if (soundNumber === 1) {
+                    await playBeep(400, 0.5); // Low beep, longer duration
+                } else {
+                    await playBeep(800, 0.5); // High beep, longer duration
+                }
+            } catch (error) {
+                console.error('Error playing sound:', error);
+            } finally {
+                // Always clean up, even if there's an error
+                isPlaying = false;
+                enableAllButtons();
+            }
+        }
+        
+        function playBeep(frequency, duration) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const audioContext = new AudioContext();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.1;
+                    
+                    // When the oscillator ends, resolve the promise
+                    oscillator.onended = () => {
+                        console.log(`Beep at ${frequency}Hz finished`);
+                        resolve();
+                    };
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + duration);
+                    
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+        
+        function disableAllButtons() {
+            document.getElementById('button1').disabled = true;
+            document.getElementById('button2').disabled = true;
+        }
+        
+        function enableAllButtons() {
+            document.getElementById('button1').disabled = false;
+            document.getElementById('button2').disabled = false;
+        }
+    </script>
+</body>
+</html>
