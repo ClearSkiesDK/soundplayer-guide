@@ -3,7 +3,7 @@
 Interactive examples demonstrating JavaScript audio programming concepts.
 
 ## Live Demo
-Visit: https://github.com/clearskiesdk/soundplayer-guide/
+Visit: https://clearskiesdk.github.io/soundplayer-guide/
 
 ## Contents
 - Simple Sound Player (callbacks)
